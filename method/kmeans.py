@@ -1,0 +1,39 @@
+from deploy.kmeans.kmeans_global import kmeans_global
+from deploy.kmeans.kmeans_local import kmeans_local
+
+
+class kmeans:
+    def __init__(self, train_data, train_data_val, test_data, test_data_val, data_agg, data_agg_val, config, num_dim,
+                 num_data, num_client, n_cluster):
+        self.device = 'cuda'
+        self.train_data = train_data
+        self.train_data_val = train_data_val
+        self.test_data = test_data
+        self.test_data_val = test_data_val
+        self.data_agg = data_agg
+        self.data_agg_val = data_agg_val
+        self.config = config
+        self.num_data = num_data
+        self.num_dim = num_dim
+        self.num_client = num_client
+        self.n_cluster = n_cluster
+        self.local_client_list = []
+        self.global_client = None
+        self.center = None
+        self.n_cluster = 2
+
+    def init_client(self):
+        self.global_client = kmeans_global(data=self.data_agg, data_val=self.data_agg_val, n_cluster=self.n_cluster)
+        for i in range(0, len(self.config)):
+            A = kmeans_local(c_id=i, train_data=self.train_data[i], test_data=self.test_data[i], n_cluster=self.n_cluster)
+            self.local_client_list.append(A)
+            self.global_client.connect(i, A)
+
+    def run(self):
+        for i in range(0, len(self.config)):
+            self.local_client_list[i].kmeans_task1(self.global_client)
+        self.global_client.kmeans_task1(num_client=self.num_client,num_dim=self.num_dim,num_data=self.num_data,config=self.config)
+        print(self.global_client.cluster_center)
+        for i in range(0, len(self.config)):
+            self.local_client_list[i].kmeans_task2(self.global_client)
+        self.global_client.kmeans_task2(num_client=self.num_client, num_data=self.num_data)
