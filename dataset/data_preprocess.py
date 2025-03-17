@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 def ccfd(config):
     current =  os.path.dirname(__file__)
-    data = pd.read_csv(current + "\\post" + "\\ccfd_slice.csv")
+    data = pd.read_csv(current + "\\post" + "\\ccfd_slice1.csv")
     # print(data)
     # 分离label
     data_label = data.iloc[:, 28]

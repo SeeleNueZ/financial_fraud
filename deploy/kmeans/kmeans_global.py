@@ -73,8 +73,9 @@ class kmeans_global(global_client):
         dis = torch.zeros(self.msg[0].shape[0], self.n_cluster)
         for i in range(0, num_client):
             dis = self.msg[i] ** 2 + dis
+            # print("dis", dis)
         dis = torch.sqrt(dis)
-        print(dis.shape)
+        # print(dis)
         return dis
 
     def get_center(self):

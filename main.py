@@ -19,3 +19,4 @@ if __name__ == "__main__":
     Base.init_client()
     print(num_data)
     Base.run()
+    Base.cal()

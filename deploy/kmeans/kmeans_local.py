@@ -28,6 +28,7 @@ class kmeans_local(local_client):
 
     def kmeans_task2(self, client):
         self.cluster_center = self.msg[-1]
+        # print("client,center:",self.cluster_center)
         distances = torch.cdist(self.test_data, torch.tensor(self.cluster_center, dtype=torch.float32))
         self.send(client, {self.c_id: distances})
         # print(out)
