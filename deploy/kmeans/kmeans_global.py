@@ -46,6 +46,8 @@ class kmeans_global(global_client):
             # 对应位置填入对应排列
             center_list[h, :] = np.concatenate(temp)
         # print(center_list)
+        for i in config:
+            pass
 
         for i in range(num_data):
             temp = []

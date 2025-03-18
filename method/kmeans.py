@@ -63,7 +63,7 @@ class kmeans:
 
     def cal(self):
         self.dis = 1 / (torch.exp(self.dis))
-        self.dis = self.dis / self.dis.sum(axis=1)[:, None] z
+        self.dis = self.dis / self.dis.sum(axis=1)[:, None]
         _, max_indices = torch.max(self.dis, dim=1)
         # 逐元素比较两个 Tensor
         equal_elements = max_indices == self.test_data_val
