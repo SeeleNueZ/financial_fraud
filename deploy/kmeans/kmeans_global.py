@@ -64,6 +64,7 @@ class kmeans_global(global_client):
             idx = self.encode(temp, self.n_cluster, num_client)
             # 加入i对象的权重，默认是一样的
             center_weights[idx] += 1
+
         for i in range(self.data.shape[0]):
             temp = []
             # 提取 i 对应的那一条数值，比如0 0 1 1
