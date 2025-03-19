@@ -48,8 +48,9 @@ class kmeans_global(global_client):
         # print(center_list)
         label_agg = []
         for key, indices in config.items():
-            kmeans = KMeans(n_clusters=2, init=self.msg[key][0], n_init=1)
-            kmeans.cluster_centers_=self.msg[key][0]
+            kmeans = KMeans(n_clusters=2, init=self.msg[key][1], n_init=1)
+            kmeans.cluster_centers_=self.msg[key][1]
+
             label = kmeans.fit_predict(self.data[:, indices])
             label_agg.append(label)
 
@@ -58,6 +59,16 @@ class kmeans_global(global_client):
             # 提取 i 对应的那一条数值，比如0 0 1 1
             for j in range(num_client):
                 temp.append(self.msg[j][0][i])
+            # print(temp)
+            # 折合成对应的编号
+            idx = self.encode(temp, self.n_cluster, num_client)
+            # 加入i对象的权重，默认是一样的
+            center_weights[idx] += 1
+        for i in range(self.data.shape[0]):
+            temp = []
+            # 提取 i 对应的那一条数值，比如0 0 1 1
+            for j in range(num_client):
+                temp.append(label_agg[j][i])
             # print(temp)
             # 折合成对应的编号
             idx = self.encode(temp, self.n_cluster, num_client)
