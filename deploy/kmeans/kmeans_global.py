@@ -46,8 +46,12 @@ class kmeans_global(global_client):
             # 对应位置填入对应排列
             center_list[h, :] = np.concatenate(temp)
         # print(center_list)
-        for i in config:
-            pass
+        label_agg = []
+        for key, indices in config.items():
+            kmeans = KMeans(n_clusters=2, init=self.msg[key][0], n_init=1)
+            kmeans.cluster_centers_=self.msg[key][0]
+            label = kmeans.fit_predict(self.data[:, indices])
+            label_agg.append(label)
 
         for i in range(num_data):
             temp = []
