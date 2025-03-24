@@ -14,13 +14,13 @@
 ```mermaid
     flowchart LR
       A["global_data"]
-      B(("fea\nembedding"))
-      C(("gobal\nClassifier"))
+      B(("fea<br>embedding"))
+      C(("gobal<br>Classifier"))
       D["global_label"]
       T1["train_data"]
       T2["train_data_perturb"]
-      ML2(("Consistency\nRegularization"))
-      ML3(("fea\nembedding\ncopy"))
+      ML2(("Consistency<br>Regularization"))
+      ML3(("fea<br>embedding<br>copy"))
       subgraph ide1[global_client_train]
       direction LR
         A--->|split|B
@@ -34,7 +34,7 @@
       T1-->ML3
       C-->ML2
       
-      ML3<-->|Alternating update\nsynchronized|B
+      ML3<-->|Alternating update<br>synchronized|B
       
       
       end
