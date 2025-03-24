@@ -11,12 +11,36 @@
 最后的准确率判断采取直接使用较高一方的结果。（因为事实上没进行分类）
 
 ## emb+agg
-******a
 ```mermaid
     flowchart LR
-      A["JS"]
-      B["Mermaid"]
-      C["Markdown 原生"]
-      D["Markdown 定制"]
-      A --制作了--> B --内嵌到了 --> C --衍生了--> D
+      A["global_data"]
+      B(("fea\nembedding"))
+      C(("gobal\nClassifier"))
+      D["global_label"]
+      T1["train_data"]
+      T2["train_data_perturb"]
+      ML2(("Consistency\nRegularization"))
+      ML3(("fea\nembedding\ncopy"))
+      subgraph ide1[global_client_train]
+      direction LR
+        A--->|split|B
+        C<-->|loss|D
+%%        D-->|update|C
+%%        D-->|update|B
+      end
+      subgraph ide2[local_client_train]
+      direction LR
+      T2-->ML3
+      T1-->ML3
+      C-->ML2
+      
+      ML3<-->|Alternating update\nsynchronized|B
+      
+      
+      end
+       B-->C
+       ML3-->C
+       
+      
+      
 ```
