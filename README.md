@@ -5,12 +5,12 @@
 3. C
 ## function
 * k-mean
-* 一个变形的linear
+* LR1(emb+agg)
 * 不知道
 ## kmeans
 最后的准确率判断采取直接使用较高一方的结果。（因为事实上没进行分类）
 
-## emb+agg
+## LR1(emb+agg)
 ```mermaid
     flowchart LR
       A["global_data"]
