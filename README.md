@@ -25,8 +25,10 @@
       T4("total_loss")
       ML2(("Consistency<br>Regularization"))
       ML3(("fea<br>embedding<br>copy"))
-      style T4 fill:#1597A5,stroke:##FFF4DE,stroke-width:2px
-      style F fill:#1597A5,stroke:##FFF4DE,stroke-width:2px
+      classDef end1 fill:#4B65AF,stroke:#666,stroke-width:2px,color:#fffff1
+      class T4,F end1;
+      classDef back fill:#111111
+      class ide1 back;
       subgraph ide1[global_client_train]
       direction LR
         A--->|split|B
