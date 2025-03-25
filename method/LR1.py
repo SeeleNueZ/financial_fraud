@@ -31,12 +31,14 @@ class LR1:
         for i in range(4):
             model = LR1_g(self.num_dim, self.emb_config, self.emb_out)
             model_list.append(model)
-        classifier_model = LR1_local(self.num_dim * self.num_client, self.classifier_config, 1,lr=self.lr)
-        self.global_client = LR1_global(data=self.data_agg, data_val=self.data_agg_val, model=model_list, lr=self.lr, classifier=classifier_model)
+        classifier_model = LR1_g(self.num_dim * self.num_client, self.classifier_config, 1,)
+        self.global_client = LR1_global(data=self.data_agg, data_val=self.data_agg_val, model=model_list, lr=self.lr,
+                                        classifier=classifier_model)
         for i in range(0, len(self.config)):
-            A = LR1_local(c_id=i, train_data=self.train_data[i], test_data=self.test_data[i])
+            A = LR1_local(c_id=i, train_data=self.train_data[i], test_data=self.test_data[i], lr=self.lr)
             self.local_client_list.append(A)
             self.global_client.connect(i, A)
+        self.global_client.init()
 
     def run(self):
         for i in range(0, len(self.config)):

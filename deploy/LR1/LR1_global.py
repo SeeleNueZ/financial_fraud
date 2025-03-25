@@ -4,7 +4,7 @@ from deploy.global_client import global_client
 
 
 class LR1_global(global_client):
-    def __init__(self, data, data_val,model, classifier, lr):
+    def __init__(self, data, data_val, model, classifier, lr):
         super().__init__(data=data, data_val=data_val, model=model)
         # model:四个emb
         # classifier：全局分类器
@@ -16,7 +16,12 @@ class LR1_global(global_client):
     def init(self):
         self.classifier_opti = torch.optim.Adam(self.model.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
                                                 weight_decay=0)
-        list_temp={}
-        for _ in self.model:
-            pass
+        list_temp = []
+        for i in self.model:
+            a = torch.optim.Adam(i.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
+                                 weight_decay=0)
+            list_temp.append(a)
+        self.model_opti = list_temp
 
+    def pre_train(self):
+        pass
