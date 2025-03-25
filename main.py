@@ -1,5 +1,5 @@
 from dataset.data_preprocess import ccfd
-from method import kmeans
+from method import kmeans, LR1
 
 if __name__ == "__main__":
     c1 = [x for x in range(0, 6)]
@@ -15,8 +15,12 @@ if __name__ == "__main__":
     Base = kmeans.kmeans(train_data=train_data, train_data_val=train_data_val, test_data=test_data,
                          test_data_val=test_data_val, data_agg=data_agg, data_agg_val=data_agg_val, n_cluster=2,
                          config=config, num_dim=num_dim, num_data=num_data, num_client=4)
+    LR1 = LR1.LR1(train_data=train_data, train_data_val=train_data_val, test_data=test_data,
+                  test_data_val=test_data_val, data_agg=data_agg, data_agg_val=data_agg_val,
+                  config=config, num_dim=num_dim, num_data=num_data, num_client=4)
 
-    Base.init_client()
-    print(num_data)
-    Base.run()
-    Base.cal()
+    # Base.init_client()
+    # print(num_data)
+    # Base.run()
+    # Base.cal()
+    LR1.init_client()
