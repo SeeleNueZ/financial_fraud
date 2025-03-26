@@ -33,3 +33,8 @@ class LR1_global(global_client):
             train_data = self.data[batch, :]
             train_data = train_data[:, config[i]]
             print(train_data.shape)
+            train_data = self.model[i].forward(train_data)
+            list_tensor.append(train_data)
+
+        train_data = torch.cat(list_tensor, dim=1)
+        print(train_data.shape)

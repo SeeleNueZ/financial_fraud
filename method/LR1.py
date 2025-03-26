@@ -34,7 +34,7 @@ class LR1:
     def init_client(self):
         model_list = []
         for i in range(4):
-            model = LR1_g(self.num_dim, self.emb_config, self.emb_out)
+            model = LR1_g(len(self.config[i]), self.emb_config, self.emb_out)
             model_list.append(model)
         classifier_model = LR1_g(self.num_dim * self.num_client, self.classifier_config, 1, )
         self.global_client = LR1_global(data=self.data_agg, data_val=self.data_agg_val, model=model_list, lr=self.lr,
