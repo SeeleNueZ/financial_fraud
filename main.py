@@ -24,3 +24,4 @@ if __name__ == "__main__":
     # Base.run()
     # Base.cal()
     LR1.init_client()
+    LR1.global_pre_train()

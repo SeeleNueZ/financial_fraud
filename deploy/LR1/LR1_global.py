@@ -14,7 +14,7 @@ class LR1_global(global_client):
         self.lr = lr
 
     def init(self):
-        self.classifier_opti = torch.optim.Adam(self.model.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
+        self.classifier_opti = torch.optim.Adam(self.classifier.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
                                                 weight_decay=0)
         list_temp = []
         for i in self.model:
@@ -23,5 +23,13 @@ class LR1_global(global_client):
             list_temp.append(a)
         self.model_opti = list_temp
 
-    def pre_train(self):
-        pass
+    def pre_train(self, batch, config):
+        list_tensor = []
+        for i in config:
+            self.model[i].train()
+            self.model_opti[i].zero_grad()
+            # print(batch, config[i])
+            # print(self.data.shape)
+            train_data = self.data[batch, :]
+            train_data = train_data[:, config[i]]
+            print(train_data.shape)
