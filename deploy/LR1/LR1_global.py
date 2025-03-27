@@ -1,4 +1,5 @@
 import torch.optim
+from torch import nn
 
 from deploy.global_client import global_client
 
@@ -12,6 +13,8 @@ class LR1_global(global_client):
         self.model_opti = None
         self.classifier_opti = None
         self.lr = lr
+        self.criterion = nn.BCELoss(reduction="mean")
+        self.cal_label = torch.tensor(data_val.shape)
 
     def init(self):
         self.classifier_opti = torch.optim.Adam(self.classifier.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
@@ -32,9 +35,24 @@ class LR1_global(global_client):
             # print(self.data.shape)
             train_data = self.data[batch, :]
             train_data = train_data[:, config[i]]
-            print(train_data.shape)
+            # print(train_data.shape)
             train_data = self.model[i].forward(train_data)
             list_tensor.append(train_data)
 
         train_data = torch.cat(list_tensor, dim=1)
-        print(train_data.shape)
+        # print(train_data.shape)
+        self.classifier_opti.zero_grad()
+        y = self.classifier(train_data)
+        # print(y.shape, self.data_val[batch].shape)
+        y = y.squeeze()
+        m = nn.Sigmoid()
+        y = m(y)
+        y_copy = y.clone().detach()
+        loss = self.criterion(y, self.data_val[batch])
+        return_loss = loss.clone().detach()
+        loss.backward()
+        self.classifier_opti.step()
+        for i in config:
+            self.model_opti[i].step()
+        print(self.cal_label)
+        return return_loss

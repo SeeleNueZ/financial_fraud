@@ -26,7 +26,7 @@ class LR1:
         self.emb_out = 8
         self.classifier_config = [64, 32, 4]
         self.batch_size_pre = 32
-        self.epoch_pre = 100
+        self.epoch_pre = 80
         self.batch_size = 32
         self.epoch = 100
         self.lr = 1e-3
@@ -36,7 +36,7 @@ class LR1:
         for i in range(4):
             model = LR1_g(len(self.config[i]), self.emb_config, self.emb_out)
             model_list.append(model)
-        classifier_model = LR1_g(self.num_dim * self.num_client, self.classifier_config, 1, )
+        classifier_model = LR1_g(self.emb_out * self.num_client, self.classifier_config, 1, )
         self.global_client = LR1_global(data=self.data_agg, data_val=self.data_agg_val, model=model_list, lr=self.lr,
                                         classifier=classifier_model)
         for i in range(0, len(self.config)):
@@ -47,5 +47,10 @@ class LR1:
 
     def global_pre_train(self):
         DL = DataLoader.DataLoader(self.data_agg.shape[0], self.batch_size, shuffle=True)
-        for i, batch in enumerate(DL):
-            self.global_client.pre_train(batch=batch, config=self.config)
+        for ep in range(0, self.epoch_pre):
+            loss = 0
+            n = 0
+            for i, batch in enumerate(DL):
+                loss = loss + self.global_client.pre_train(batch=batch, config=self.config)
+                n = n + 1
+            print("epoch:{},loss:{:.6f}".format(ep, (loss / n).item()))
