@@ -54,3 +54,4 @@ class LR1:
                 loss = loss + self.global_client.pre_train(batch=batch, config=self.config)
                 n = n + 1
             print("epoch:{},loss:{:.6f}".format(ep, (loss / n).item()))
+        print("acc:{:.5f}".format(self.global_client.global_acc_cal()))

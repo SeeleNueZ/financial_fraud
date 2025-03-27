@@ -14,7 +14,7 @@ class LR1_global(global_client):
         self.classifier_opti = None
         self.lr = lr
         self.criterion = nn.BCELoss(reduction="mean")
-        self.cal_label = torch.tensor(data_val.shape)
+        self.cal_label = torch.ones(data_val.shape)
 
     def init(self):
         self.classifier_opti = torch.optim.Adam(self.classifier.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
@@ -48,11 +48,23 @@ class LR1_global(global_client):
         m = nn.Sigmoid()
         y = m(y)
         y_copy = y.clone().detach()
+        y_copy = (y_copy >= 0.5).float()
         loss = self.criterion(y, self.data_val[batch])
         return_loss = loss.clone().detach()
         loss.backward()
         self.classifier_opti.step()
         for i in config:
             self.model_opti[i].step()
-        print(self.cal_label)
+        # print(self.cal_label.shape)
+        for i, ba in enumerate(batch):
+            # print(i ,ba)
+            self.cal_label[ba] = y_copy[i]
         return return_loss
+
+    def global_acc_cal(self):
+        print(self.cal_label)
+        print(self.data_val)
+        correct = torch.eq(self.cal_label, self.data_val)
+        correct_count = correct.long().sum()
+        accuracy = correct_count.item() / self.cal_label.shape[0]
+        return accuracy
