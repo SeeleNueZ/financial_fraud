@@ -68,3 +68,7 @@ class LR1_global(global_client):
         correct_count = correct.long().sum()
         accuracy = correct_count.item() / self.cal_label.shape[0]
         return accuracy
+
+    def model_trans(self,config):
+        for i in config:
+            self.send
