@@ -69,6 +69,11 @@ class LR1_global(global_client):
         accuracy = correct_count.item() / self.cal_label.shape[0]
         return accuracy
 
-    def model_trans(self,config):
+    def model_trans(self, config):
         for i in config:
-            self.send
+            list_temp=[]
+            a = self.model[i].state_dict()
+            b = self.model_opti[i].state_dict()
+            list_temp.append(a)
+            list_temp.append(b)
+            self.send(self.connected_clients[i],{self.c_id: list_temp})
