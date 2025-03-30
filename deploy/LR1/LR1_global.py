@@ -62,8 +62,8 @@ class LR1_global(global_client):
         return return_loss
 
     def global_acc_cal(self):
-        print(self.cal_label)
-        print(self.data_val)
+        # print(self.cal_label)
+        # print(self.data_val)
         correct = torch.eq(self.cal_label, self.data_val)
         correct_count = correct.long().sum()
         accuracy = correct_count.item() / self.cal_label.shape[0]
@@ -71,9 +71,22 @@ class LR1_global(global_client):
 
     def model_trans(self, config):
         for i in config:
-            list_temp=[]
+            list_temp = []
             a = self.model[i].state_dict()
             b = self.model_opti[i].state_dict()
             list_temp.append(a)
             list_temp.append(b)
-            self.send(self.connected_clients[i],{self.c_id: list_temp})
+            self.send(self.connected_clients[i], {self.c_id: list_temp})
+
+    def train_update_local(self, config):
+        # 来自local的输出x2
+
+        y = []
+        y_noise = []
+        for i in config:
+            y.append(self.msg[i][0])
+            y_noise.append(self.msg[i][1])
+        y = torch.cat(y, dim=1)
+        y_noise = torch.cat(y_noise, dim=1)
+
+
