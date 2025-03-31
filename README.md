@@ -6,7 +6,7 @@
 ## function
 * k-mean
 * LR1(emb+agg)
-* 不知道
+* Fedonce(修改版)
 ## kmeans
 最后的准确率判断采取直接使用较高一方的结果。（因为事实上没进行分类）
 
@@ -58,13 +58,36 @@
       subgraph ide1[global/local_train]
       direction LR
       G1-->|noise|G2
-      G1-->GB3
       G2-->GB3
       GB3-->C
       GB3<-->|Synchronize<br>alternating update|B
-      C-->G11-->T31
+      G11-->T31
       C-->G21-->T31
       T31-->T4
       end
       
 ```
+### Fedonce
+```mermaid
+    flowchart LR
+    A1["local_client1"]
+    A2["local_client2"]
+    B1("model1")
+    B2("model2")
+    B["global_data"]
+    C1(("unsupervised<br>loss"))
+    C2(("unsupervised<br>loss"))
+    E1("agg_model")
+    E2("classifier")
+    F1["global_label"]
+    F2(("supervised<br>loss"))
+    A1-->B1<-->C1
+    A2-->B2<-->C2
+    B1-->E1
+    B2-->E1
+    B-->E1
+    E1-->E2-->F2
+    F1-->F2
+    
+```
+

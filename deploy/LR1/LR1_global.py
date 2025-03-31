@@ -15,6 +15,7 @@ class LR1_global(global_client):
         self.lr = lr
         self.criterion = nn.BCELoss(reduction="mean")
         self.cal_label = torch.ones(data_val.shape)
+        self.lamda = 0.5
 
     def init(self):
         self.classifier_opti = torch.optim.Adam(self.classifier.parameters(), betas=(0.9, 0.999), lr=self.lr, eps=1e-08,
@@ -78,9 +79,9 @@ class LR1_global(global_client):
             list_temp.append(b)
             self.send(self.connected_clients[i], {self.c_id: list_temp})
 
-    def train_update_local(self, config):
+    def train_update_local_1(self, config):
+        self.classifier_opti.zero_grad()
         # 来自local的输出x2
-
         y = []
         y_noise = []
         for i in config:
@@ -88,5 +89,119 @@ class LR1_global(global_client):
             y_noise.append(self.msg[i][1])
         y = torch.cat(y, dim=1)
         y_noise = torch.cat(y_noise, dim=1)
+        y = self.classifier(y)
+        y_noise = self.classifier(y_noise)
+        m = nn.Sigmoid()
+        y = m(y)
+        y_noise = m(y_noise)
+        loss_local = ((y - y_noise) ** 2).mean()
+        # print("loss_local")
+        # pr_loss_local = loss_local.clone().detach()
+        # print(pr_loss_local)
+
+        # global 数据的noise
+        with torch.no_grad():
+            noise = torch.empty(self.data.shape, dtype=torch.float).uniform_(0.001, 0.05)
+            global_train_data = self.data + noise
+            # print(global_train_data.shape)
+            list_tensor = []
+            for i in config:
+                self.model[i].train()
+                self.model_opti[i].zero_grad()
+                train_data = global_train_data[:, config[i]]
+                train_data = self.model[i].forward(train_data)
+                list_tensor.append(train_data)
+            global_train_data = torch.cat(list_tensor, dim=1)
+        y_global = self.classifier(global_train_data)
+        # print(y.shape, self.data_val[batch].shape)
+        y_global = y_global.squeeze()
+        y_global = m(y_global)
+        loss_global = self.criterion(y_global, self.data_val)
+        # print("loss_global")
+        # pr_loss_global = loss_global.clone().detach()
+        # print(pr_loss_global)
+        loss = loss_local + loss_global * self.lamda
+        return_loss = loss.clone().detach()
+        # print("loss", return_loss)
+        loss.backward()
+        return return_loss
+
+    def train_update_local_2(self, config):
+        for i in config:
+            for param, grad in zip(self.model[i].parameters(), self.msg[i][0]):
+                param.grad = grad.clone() if grad is not None else None
+            self.model_opti[i].load_state_dict(self.msg[i][1])
+            self.model_opti[i].step()
+        self.classifier_opti.step()
+
+    def train_update_global_1(self, config):
+        self.classifier_opti.zero_grad()
+        # 来自local的输出x2
+        with torch.no_grad():
+            y = []
+            y_noise = []
+            for i in config:
+                y.append(self.msg[i][0])
+                y_noise.append(self.msg[i][1])
+            y = torch.cat(y, dim=1)
+            y_noise = torch.cat(y_noise, dim=1)
+        y = self.classifier(y)
+        y_noise = self.classifier(y_noise)
+        m = nn.Sigmoid()
+        y = m(y)
+        y_noise = m(y_noise)
+        loss_local = ((y - y_noise) ** 2).mean()
+        # print("loss_local")
+        # pr_loss_local = loss_local.clone().detach()
+        # print(pr_loss_local)
+
+        # global 数据的noise
+        noise = torch.empty(self.data.shape, dtype=torch.float).uniform_(0.001, 0.05)
+        global_train_data = self.data + noise
+        # print(global_train_data.shape)
+        list_tensor = []
+        for i in config:
+            self.model[i].train()
+            self.model_opti[i].zero_grad()
+            train_data = global_train_data[:, config[i]]
+            train_data = self.model[i].forward(train_data)
+            list_tensor.append(train_data)
+        global_train_data = torch.cat(list_tensor, dim=1)
+        y_global = self.classifier(global_train_data)
+        # print(y.shape, self.data_val[batch].shape)
+        y_global = y_global.squeeze()
+        y_global = m(y_global)
+        loss_global = self.criterion(y_global, self.data_val)
+        # print("loss_global")
+        # pr_loss_global = loss_global.clone().detach()
+        # print(pr_loss_global)
+        loss = loss_local + loss_global * self.lamda
+        return_loss = loss.clone().detach()
+        # print("loss", return_loss)
+        loss.backward()
+
+        # update parameters
+        for i in config:
+            a = [p.grad.clone().detach() for p in self.model[i].parameters()]
+            b = self.model_opti[i].state_dict()
+            self.send(self.connected_clients[i], {self.c_id: [a, b]})
+            self.model_opti[i].step()
+        self.classifier_opti.step()
+        return return_loss
+
+    def test_data_eval(self, config):
+        y = []
+        for i in config:
+            y.append(self.msg[i])
+        y = torch.cat(y, dim=1)
+        y = self.classifier(y)
+        m = nn.Sigmoid()
+        y = m(y)
+        y = y.clone().detach()
+        y = (y >= 0.5).float()
+        # correct = torch.eq(self.cal_label, self.data_val)
+        # correct_count = correct.long().sum()
+        # accuracy = correct_count.item() / self.cal_label.shape[0]
+        return y
 
 
