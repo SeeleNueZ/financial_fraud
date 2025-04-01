@@ -26,10 +26,10 @@ class LR1:
         self.emb_out = 8
         self.classifier_config = [64, 32, 4]
         self.batch_size_pre = 32
-        self.epoch_pre = 200
-        self.batch_size = 256
-        self.epoch = 800
-        self.lr = 1e-4
+        self.epoch_pre = 150
+        self.batch_size = 128
+        self.epoch = 500
+        self.lr = 1e-3
 
     def init_client(self):
         model_list = []
@@ -53,8 +53,8 @@ class LR1:
             for i, batch in enumerate(DL):
                 loss = loss + self.global_client.pre_train(batch=batch, config=self.config)
                 n = n + 1
-            # print("epoch:{},loss:{:.6f}".format(ep, (loss / n).item()))
-        # print("acc:{:.5f}".format(self.global_client.global_acc_cal()))
+            print("epoch:{},loss:{:.6f}".format(ep, (loss / n).item()))
+        print("acc:{:.5f}".format(self.global_client.global_acc_cal()))
         self.global_client.model_trans(config=self.config)
         for i in self.config:
             model = LR1_g(len(self.config[i]), self.emb_config, self.emb_out)
@@ -71,12 +71,12 @@ class LR1:
                 for j in self.config:
                     self.local_client_list[j].train_update_local_1(batch=batch, client=self.global_client,
                                                                    noise=noise[:, self.config[j]])
-                loss = loss + self.global_client.train_update_local_1(config=self.config)
+                loss = loss + self.global_client.train_update_local_1(config=self.config, ep=ep)
                 for j in self.config:
                     self.local_client_list[j].train_update_local_2(client=self.global_client)
                 self.global_client.train_update_local_2(config=self.config)
                 n = n + 1
-            # print("epoch:{},local,loss:{:.6f}".format(ep, (loss / n).item()))
+            print("epoch:{},local,loss:{:.6f}".format(ep, (loss / n).item()))
             loss = 0
             n = 0
             for i, batch in enumerate(DL):
@@ -84,11 +84,11 @@ class LR1:
                 for j in self.config:
                     self.local_client_list[j].train_update_global_1(batch=batch, client=self.global_client,
                                                                     noise=noise[:, self.config[j]])
-                loss = loss + self.global_client.train_update_global_1(config=self.config)
+                loss = loss + self.global_client.train_update_global_1(config=self.config, ep=ep)
                 for j in self.config:
                     self.local_client_list[j].train_update_global_2()
                 n = n + 1
-            # print("epoch:{},global,loss:{:.6f}".format(ep, (loss / n).item()))
+            print("epoch:{},global,loss:{:.6f}".format(ep, (loss / n).item()))
 
     def test_data_eval(self):
         for i in self.config:

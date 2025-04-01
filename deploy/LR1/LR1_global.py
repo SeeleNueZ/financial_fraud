@@ -3,7 +3,7 @@ from torch import nn
 
 from deploy.global_client import global_client
 
-
+from tools import lamba
 class LR1_global(global_client):
     def __init__(self, data, data_val, model, classifier, lr):
         super().__init__(data=data, data_val=data_val, model=model)
@@ -74,12 +74,14 @@ class LR1_global(global_client):
         for i in config:
             list_temp = []
             a = self.model[i].state_dict()
+            self.model_opti[i] = torch.optim.Adam(params=self.model[i].parameters(), lr=1e-4)
             b = self.model_opti[i].state_dict()
             list_temp.append(a)
             list_temp.append(b)
             self.send(self.connected_clients[i], {self.c_id: list_temp})
+        self.classifier_opti = torch.optim.Adam(self.classifier.parameters(), lr=1e-4)
 
-    def train_update_local_1(self, config):
+    def train_update_local_1(self, config, ep):
         self.classifier_opti.zero_grad()
         # 来自local的输出x2
         y = []
@@ -120,7 +122,8 @@ class LR1_global(global_client):
         # print("loss_global")
         # pr_loss_global = loss_global.clone().detach()
         # print(pr_loss_global)
-        loss = loss_local + loss_global * self.lamda
+        l = lamba.lamda_decay(self.lamda,ep)
+        loss = loss_local + loss_global * l
         return_loss = loss.clone().detach()
         # print("loss", return_loss)
         loss.backward()
@@ -134,7 +137,7 @@ class LR1_global(global_client):
             self.model_opti[i].step()
         self.classifier_opti.step()
 
-    def train_update_global_1(self, config):
+    def train_update_global_1(self, config, ep):
         self.classifier_opti.zero_grad()
         # 来自local的输出x2
         with torch.no_grad():
@@ -175,7 +178,8 @@ class LR1_global(global_client):
         # print("loss_global")
         # pr_loss_global = loss_global.clone().detach()
         # print(pr_loss_global)
-        loss = loss_local + loss_global * self.lamda
+        l = lamba.lamda_decay(self.lamda,ep)
+        loss = loss_local + loss_global * l
         return_loss = loss.clone().detach()
         # print("loss", return_loss)
         loss.backward()
@@ -203,5 +207,3 @@ class LR1_global(global_client):
         # correct_count = correct.long().sum()
         # accuracy = correct_count.item() / self.cal_label.shape[0]
         return y
-
-
