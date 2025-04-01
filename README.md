@@ -1,12 +1,14 @@
 # financial_fraud
 ## dataset
-1. 数据集A
-2. 数据集B
+1. ccfd
+2. IEEE-CIS Fraud Detection
 3. C
 ## function
 * k-mean
 * LR1(emb+agg)
 * Fedonce(修改版)
+## paysim
+https://github.com/EdgarLopezPhD/PaySim
 ## kmeans
 最后的准确率判断采取直接使用较高一方的结果。（因为事实上没进行分类）
 
