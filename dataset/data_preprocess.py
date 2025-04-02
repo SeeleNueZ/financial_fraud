@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 
 def ccfd(config):
-    current =  os.path.dirname(__file__)
+    current = os.path.dirname(__file__)
     data = pd.read_csv(current + "\\post" + "\\ccfd_slice1.csv")
     # print(data)
     # 分离label
@@ -27,11 +27,14 @@ def ccfd(config):
     list_out = train_test_split(data, test_size=0.16, shuffle=True)
     # print(list_out)
     data_agg = list_out[1]
+    data_agg.to_csv(current + "\\ccfd" + "\\ccfd_global.csv", index=False)
     data_agg_val = data_agg.iloc[:, -1]
     data_agg = data_agg.iloc[:, :-1]
     # 分离测试集训练集
     client_data = train_test_split(list_out[0], test_size=0.17, shuffle=True)
     print(client_data)
+    client_data[0].to_csv(current + "\\ccfd" + "\\ccfd_train.csv", index=False)
+    client_data[1].to_csv(current + "\\ccfd" + "\\ccfd_test.csv", index=False)
     train_data = []
     test_data = []
     for key in config:
@@ -50,6 +53,7 @@ def ccfd(config):
     print(data_agg.shape)
     print(data_agg_val.shape)
     return train_data, test_data, train_data_val, test_data_val, data_agg, data_agg_val
+
 
 
 if __name__ == "__main__":
