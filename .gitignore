@@ -6,6 +6,6 @@ __pycache__
 dataset/ieee-fraud-detection.zip
 dataset/ieee-fraud-detection/sample_submission.csv
 dataset/ieee-fraud-detection/test_identity.csv
-dataset/ieee-fraud-detection/test_transaction.csv
+dataset/pre/test_transaction.csv
 dataset/ieee-fraud-detection/train_identity.csv
-dataset/ieee-fraud-detection/train_transaction.csv
+dataset/pre/train_transaction.csv
