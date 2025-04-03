@@ -9,3 +9,4 @@ dataset/ieee-fraud-detection/test_identity.csv
 dataset/pre/test_transaction.csv
 dataset/ieee-fraud-detection/train_identity.csv
 dataset/pre/train_transaction.csv
+/.idea

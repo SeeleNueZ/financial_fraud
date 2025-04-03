@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="31e93c71-dde8-4348-b3e9-a816fc531aae" name="b410_2_ff">
+        <fileTransfer rootFolder="/home/zry" accessType="SFTP" host="172.18.147.77" port="8889" sshConfigId="0ea9b243-bcb2-4a11-9e23-b07b7aade1fd" sshConfig="root@172.18.147.77:8889 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
